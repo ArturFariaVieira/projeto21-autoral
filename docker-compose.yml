@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    ports:
+      - 5433:5432
+    env_file:
+      - ./projeto21-autoral-back
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+
+  node:
+    container_name: node
+    build: ./projeto21-autoral-back
+    ports:
+      - 5000:5000
+    depends_on:
+      - postgres
+    env_file:
+      - ./projeto21-autoral-back
+
+  react:
+    container_name: react
+    build: ./projeto21-autoral-front
+    volumes:
+      - react-volume:/var/www/html
+
+  nginx_app:
+    container_name: nginx_app
+    build: ./nginx
+    ports:
+      - 80:80
+    volumes:
+      - react-volume:/var/www/html
+    depends_on:
+      - postgres
+      - node
+      - react
+
+volumes:
+  postgres-volume:
+  react-volume:
